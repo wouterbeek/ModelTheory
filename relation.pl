@@ -21,9 +21,14 @@
     symmetric/1, % +Relation:ugraph
     symmetric_closure/2, % +Relation:ugraph
                          % -SymmetricRelation:ugraph
-    transitive/1, % +Relaton:ugraph
-    transitive_closure/2 % +Relation:ugraph
-                         % -TransitiveRelation:ugraph
+    transitive/1 % +Relaton:ugraph
+  ]
+).
+:- reexport(
+  plGraph(graph_srep),
+  [
+    transitive_closure/2, % +Graph:ugraph
+                          % -Closure:ugraph
   ]
 ).
 
@@ -32,7 +37,7 @@
 Support for properties of relations.
 
 @author Wouter Beek
-@version 2012/11, 2013/08, 2014/08, 2014/10
+@version 2012/11, 2013/08, 2014/08, 2014/10-2014/11
 */
 
 :- use_module(library(aggregate)).
@@ -43,7 +48,7 @@ Support for properties of relations.
 
 :- use_module(plSet(set_theory)).
 
-:- use_module(plGraph(graph_generics)).
+:- use_module(plGraph(graph_srep)).
 
 :- meta_predicate(relational_closure(+,2,-)).
 
@@ -214,6 +219,8 @@ transitive(Relation):-
   ).
 
 
+/* Transitive closure over a srep graph / ugraph could have been implemented
+   using relational_closure/3:
 %! transitive_closure(+Relation:ugraph, -TransitiveRelation:ugraph) is det.
 
 transitive_closure(Relation, TransitiveRelation):-
@@ -228,6 +235,7 @@ transitive_closure(Relation, TransitiveRelation):-
     ),
     TransitiveRelation
   ).
+*/
 
 
 
