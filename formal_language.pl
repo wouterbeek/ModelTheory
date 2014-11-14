@@ -251,15 +251,12 @@ formula0(AtomicFormula, 0):-
 % Recursive case: unary logical connective.
 formula0(Formula, Depth):-
   % If we do not perform this check, formula/2 will loop.
-  (
-    nonvar(Formula)
-  ->
-    % We cannot use compound_name_arguments/3 here,
-    % since this would throw a type_error for
-    % atomic instantiation of `Formula`.
-    Formula =.. [UnaryConnective,Subformula]
-  ;
-    true
+  (   nonvar(Formula)
+  ->  % We cannot use compound_name_arguments/3 here,
+      % since this would throw a type_error for
+      % atomic instantiation of `Formula`.
+      Formula =.. [UnaryConnective,Subformula]
+  ;   true
   ),
 
   % Make sure the logical connective is unary.
@@ -267,65 +264,48 @@ formula0(Formula, Depth):-
 
   % Based on whether the operator depth is given,
   % we can generate the subformulas more/less efficient.
-  (
-    nonvar(Depth)
-  ->
-    succ(Subdepth, Depth),
-    formula0(Subformula, Subdepth)
-  ;
-    formula0(Subformula, Subdepth),
-    succ(Subdepth, Depth)
+  (   nonvar(Depth)
+  ->  succ(Subdepth, Depth),
+      formula0(Subformula, Subdepth)
+  ;   formula0(Subformula, Subdepth),
+      succ(Subdepth, Depth)
   ),
 
   % If we were not given a formula, we need to construct it
   % based on its subformulas.
-  (
-    var(Formula)
-  ->
-    compound_name_arguments(Formula, UnaryConnective, [Subformula])
-  ;
-    true
+  (   var(Formula)
+  ->  compound_name_arguments(Formula, UnaryConnective, [Subformula])
+  ;   true
   ).
 % Recursive case: binary logical connective.
 formula0(Formula, Depth):-
-  (
-    nonvar(Formula)
-  ->
-    % We cannot use compound_name_arguments/3 here,
-    % since this would throw a type_error for
-    % atomic instantiation of `Formula`.
-    Formula =.. [BinaryConnective|Subformulas]
-  ;
-    true
+  (   nonvar(Formula)
+  ->  % We cannot use compound_name_arguments/3 here,
+      % since this would throw a type_error for
+      % atomic instantiation of `Formula`.
+      Formula =.. [BinaryConnective|Subformulas]
+  ;   true
   ),
 
   logical_connective(BinaryConnective, 2),
 
-  (
-    nonvar(Depth)
-  ->
-    succ(Subdepth1, Depth),
-    formula0(Subformula1, Subdepth1),
-    betwixt(0, Subdepth1, Subdepth2),
-    formula0(Subformula2, Subdepth2)
-  ;
-    formula0(Subformula1, Subdepth1),
-    succ(Subdepth1, Depth),
-    betwixt(0, Subdepth1, Subdepth2),
-    formula0(Subformula2, Subdepth2)
+  (   nonvar(Depth)
+  ->  succ(Subdepth1, Depth),
+      formula0(Subformula1, Subdepth1),
+      betwixt(0, Subdepth1, Subdepth2),
+      formula0(Subformula2, Subdepth2)
+  ;   formula0(Subformula1, Subdepth1),
+      succ(Subdepth1, Depth),
+      betwixt(0, Subdepth1, Subdepth2),
+      formula0(Subformula2, Subdepth2)
   ),
-  (
-    Subformulas = [Subformula1,Subformula2]
-  ;
-    Subformulas = [Subformula2,Subformula1]
+  (   Subformulas = [Subformula1,Subformula2]
+  ;   Subformulas = [Subformula2,Subformula1]
   ),
 
-  (
-    var(Formula)
-  ->
-    compound_name_arguments(Formula, BinaryConnective, Subformulas)
-  ;
-    true
+  (   var(Formula)
+  ->  compound_name_arguments(Formula, BinaryConnective, Subformulas)
+  ;   true
   ).
 
 
