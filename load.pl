@@ -8,7 +8,7 @@
 :- load_project([
     plc-'Prolog-Library-Collection',
     plDcg,
-    plSet,
-    plGraph
+    plGraph,
+    plSet
 ]).
 

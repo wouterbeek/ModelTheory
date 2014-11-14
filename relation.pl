@@ -39,11 +39,13 @@ Support for properties of relations.
 :- use_module(library(lists), except([delete/3,subset/2])).
 
 :- use_module(generics(lambda_meta)).
+:- use_module(generics(pair_ext)).
 :- use_module(pl(pl_mode)).
 
 :- use_module(plSet(set_theory)).
 
-:- use_module(plGraph(graph_generics)).
+:- use_module(plGraph(graph_edge)).
+:- use_module(plGraph(graph_srep)).
 
 :- meta_predicate(relational_closure(+,2,-)).
 
