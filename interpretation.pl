@@ -25,7 +25,7 @@ into the universe of discourse.
 
 :- use_module(plSet(universe_of_discourse)).
 
-:- use_module(plMt(formal_language)).
+:- use_module(mt(formal_language)).
 
 :- dynamic(interpretation/2).
 

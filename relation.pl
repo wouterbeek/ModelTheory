@@ -36,10 +36,9 @@ Support for properties of relations.
 */
 
 :- use_module(library(aggregate)).
-:- use_module(library(lambda)).
 :- use_module(library(lists), except([delete/3,subset/2])).
 
-:- use_module(generics(pair_ext)).
+:- use_module(generics(lambda_meta)).
 :- use_module(pl(pl_mode)).
 
 :- use_module(plSet(set_theory)).
