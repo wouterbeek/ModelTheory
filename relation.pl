@@ -43,6 +43,7 @@ Support for properties of relations.
 :- use_module(library(aggregate)).
 :- use_module(library(lists), except([delete/3,subset/2])).
 
+:- use_module(generics(closure)).
 :- use_module(generics(lambda_meta)).
 :- use_module(generics(pair_ext)).
 :- use_module(pl(pl_mode)).
@@ -87,12 +88,12 @@ equivalence(Relation):-
 
 equivalence_class(Element, EquivalenceRelation, EquivalenceClass):-
   closure(
-    [Element],
     % Since an equivalence relation is symmetric,
     % we do not need to use e.g. adjacent/3 here.
     \Element^EquivalentElement^(
       relation_pair(EquivalenceRelation, Element-EquivalentElement)
     ),
+    [Element],
     EquivalenceClass
   ).
 
@@ -256,6 +257,6 @@ transitive_closure(Relation, TransitiveRelation):-
 
 relational_closure(Relation, Goal, ClosedRelation):-
   relation(Relation, Set, Pairs),
-  closure(Pairs, Goal, ClosedPairs),
+  closure(Goal, Pairs, ClosedPairs),
   relation(ClosedRelation, Set, ClosedPairs).
 
