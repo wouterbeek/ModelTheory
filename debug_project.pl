@@ -11,7 +11,7 @@ Generic code for debugging a project:
   * Load all subdirectories and Prolog files contained in those directories.
 
 @author Wouter Beek
-@version 2014/10/31
+@version 2014/11/19
 */
 
 :- use_module(library(ansi_term)).
@@ -54,7 +54,6 @@ do_not_load0(debug_project).
 do_not_load0(index).
 do_not_load0(load).
 do_not_load0(load_project).
-do_not_load0(rfc2616_basic).
 do_not_load0(run).
 
 
