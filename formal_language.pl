@@ -373,13 +373,13 @@ relational_signature(signature([_|_],[],_)).
 % Returns the signature of the current formal language.
 %
 % A signature has the following form
-% ~~~{.pl}
+% ```prolog
 % signature(
 %   -Predicates:ordset(atom),
 %   -FunctionSymbols:ordset(atom),
 %   -ArityFunction:list(pair(atom,positive_integer))
 % )
-% ~~~
+% ```
 %
 % @tbd Add support for function symbols.
 
