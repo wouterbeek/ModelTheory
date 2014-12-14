@@ -24,13 +24,6 @@
     transitive/1 % +Relaton:ugraph
   ]
 ).
-:- reexport(
-  plGraph(graph_srep),
-  [
-    transitive_closure/2 % +Graph:ugraph
-                         % -Closure:ugraph
-  ]
-).
 
 /** <module> Relation
 
