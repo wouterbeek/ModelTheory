@@ -43,8 +43,8 @@ Support for properties of relations.
 
 :- use_module(plSet(set_theory)).
 
-:- use_module(plGraph(graph_edge)).
 :- use_module(plGraph(s_graph/s_graph)).
+:- use_module(plGraph(s_graph/s_graph_edge)).
 
 :- meta_predicate(relational_closure(+,2,-)).
 
@@ -157,7 +157,7 @@ reflexive_closure(Relation, ReflexiveRelation):-
 %! relation(-Relation:ugraph, +Set:ordset, +Pairs:ordset(pair)) is det.
 
 relation(Relation, Set, Pairs):-
-  graph_components(Relation, Set, Pairs).
+  s_graph_components(Relation, Set, Pairs).
 
 
 %! relation_element(+Relation:ugraph, +Element) is semidet.
@@ -172,7 +172,7 @@ relation_element(Relation, Element):-
 % The extension of a binary relation.
 
 relation_pair(Relation, Pair):-
-  edge(Relation, Pair).
+  s_edge(Relation, Pair).
 
 
 %! symmetric(+Relation:ugraph) is semidet.
