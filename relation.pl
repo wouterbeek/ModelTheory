@@ -51,7 +51,7 @@ Support for properties of relations.
 :- use_module(plSet(set_theory)).
 
 :- use_module(plGraph(graph_edge)).
-:- use_module(plGraph(graph_srep)).
+:- use_module(plGraph(s_graph/s_graph)).
 
 :- meta_predicate(relational_closure(+,2,-)).
 
