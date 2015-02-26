@@ -36,10 +36,10 @@ Support for properties of relations.
 :- use_module(library(aggregate)).
 :- use_module(library(lists), except([delete/3,subset/2])).
 
-:- use_module(generics(closure)).
-:- use_module(generics(lambda_meta)).
-:- use_module(generics(pair_ext)).
-:- use_module(pl(pl_mode)).
+:- use_module(plc(generics/closure)).
+:- use_module(plc(generics/lambda_meta)).
+:- use_module(plc(generics/pair_ext)).
+:- use_module(plc(prolog/pl_mode)).
 
 :- use_module(plSet(set_theory)).
 
@@ -47,6 +47,8 @@ Support for properties of relations.
 :- use_module(plGraph(s_graph/s_graph_edge)).
 
 :- meta_predicate(relational_closure(+,2,-)).
+
+
 
 
 

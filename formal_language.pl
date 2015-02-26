@@ -45,9 +45,9 @@
 :- use_module(library(pairs)).
 :- use_module(library(plunit)).
 
-:- use_module(generics(db_ext)).
-:- use_module(generics(typecheck)).
-:- use_module(math(math_ext)).
+:- use_module(plc(generics/db_ext)).
+:- use_module(plc(generics/typecheck)).
+:- use_module(plc(math/math_ext)).
 
 :- op(900, xf,  ¬). % U+00AC
 :- op(900, xfx, ∧). % U+2227
@@ -61,6 +61,8 @@
 :- dynamic(logical_connective/2).
 
 :- dynamic(predicate/2).
+
+
 
 
 

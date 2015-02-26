@@ -1,7 +1,8 @@
-% Loads debug tools for the Model-Theory library.
+% Loads debug tools for the ModelTheory library.
+
+:- use_module(library(debug)).
 
 :- [load].
 
-% Load all files.
 :- use_module(debug_project).
 :- debug_all_files.

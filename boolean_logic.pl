@@ -15,6 +15,10 @@ Predicates implementing Boolean logic.
 @version 2013/05
 */
 
+
+
+
+
 boolean_or(fail, fail, fail).
 boolean_or(true, fail, true).
 boolean_or(fail, true, true).

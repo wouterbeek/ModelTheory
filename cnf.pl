@@ -14,6 +14,8 @@
 
 
 
+
+
 cnf(Formula1, CNF):-
   cnf_rule(Formula1, Formula2),
   cnf(Formula2, CNF).

@@ -21,7 +21,7 @@ into the universe of discourse.
 :- use_module(library(apply)).
 :- use_module(library(plunit)).
 
-:- use_module(generics(db_ext)).
+:- use_module(plc(generics/db_ext)).
 
 :- use_module(plSet(universe_of_discourse)).
 

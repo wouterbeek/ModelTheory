@@ -31,7 +31,7 @@ A compound term of the form =|g(-Var,+Val:atom)|=
 :- use_module(library(ordsets)).
 :- use_module(library(plunit)).
 
-:- use_module(generics(db_ext)).
+:- use_module(plc(generics/db_ext)).
 
 %! domain(?Object:atom) is nondet.
 :- dynamic(domain/1).

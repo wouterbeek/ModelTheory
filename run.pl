@@ -1,4 +1,4 @@
-% Standalone execution of the Model-Theory library.
+% Standalone execution of the ModelTheory library.
 
 :- if(current_prolog_flag(argv, ['--debug'|_])).
   :- ensure_loaded(debug).
