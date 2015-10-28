@@ -1,12 +1,12 @@
 :- module(
   relation,
   [
-    equivalence/1, % +Relation:ugraph
-    equivalence_class/3, % +Element
-                         % +EquivalenceRelation:ugraph
-                         % -EquivalenceClass:ordset
-    quotient_set/3, % +Set:ordset
-                    % +EquivalenceRelation:ugraph
+    equiv/1, % +Relation:ugraph
+    equiv_class/3, % +EquivalenceRelation:ugraph
+                   % +Element
+                   % -EquivalenceClass:ordset
+    quotient_set/3, % +EquivalenceRelation:ugraph
+                    % +Set:ordset
                     % -QuotientSet:ordset(ordset)
     reflexive/1, % +Relation:ugraph
     reflexive_closure/2, % +Relation:ugraph
@@ -14,8 +14,6 @@
     relation/3, % ?Relation:ugraph
                 % ?Set:ordset
                 % ?Pairs:ordset(pair)
-    relation_element/2, % +Relation:ugraph
-                        % ?Element
     relation_pair/2, % +Relation:ugraph
                      % ?Pair:pair
     symmetric/1, % +Relation:ugraph
@@ -30,21 +28,18 @@
 Support for properties of relations.
 
 @author Wouter Beek
-@version 2012/11, 2013/08, 2014/08, 2014/10-2014/11
+@license MIT license
+@version 2015/10
 */
 
 :- use_module(library(aggregate)).
-:- use_module(library(lists), except([delete/3,subset/2])).
-
-:- use_module(plc(generics/closure)).
-:- use_module(plc(generics/lambda_meta)).
-:- use_module(plc(generics/pair_ext)).
-:- use_module(plc(prolog/pl_mode)).
-
-:- use_module(plSet(set_theory)).
-
-:- use_module(plGraph(s_graph/s_graph)).
-:- use_module(plGraph(s_graph/s_graph_edge)).
+:- use_module(library(closure)).
+:- use_module(library(graph/graph_test)).
+:- use_module(library(graph/s/s_edge)).
+:- use_module(library(graph/s/s_graph)).
+:- use_module(library(lambda)).
+:- use_module(library(lists)).
+:- use_module(library(pair_ext)).
 
 :- meta_predicate(relational_closure(+,2,-)).
 
@@ -52,50 +47,99 @@ Support for properties of relations.
 
 
 
-%! equivalence(+Relation:ugraph) is semidet.
-% Succeeds if the given relation is an equivalence relation.
-
-equivalence(Relation):-
-  reflexive(Relation),
-  symmetric(Relation),
-  transitive(Relation).
-
-
-%! equivalence_class(
+%! equiv_class(
 %!   +EquivalenceRelation:ugraph,
 %!   +Element,
 %!   -EquivalenceClass:ordset
 %! ) is det.
-% Returns the equivalence class of =X= relative to equivalence relation =R=.
+% Returns the equivalence class of Element relative to
+% the given EquivalenceRelation.
 %
 % The function that maps from elements onto their equivalence classes is
-% sometimes calles the *|canonical projection map|*.
+% sometimes called the *|canonical projection map|*.
 %
+% @arg EquivalenceRelation An binary relation that is reflexive,
+%      symmetric and transitive, represented as a directed graph.
 % @arg Element The element whose equivalence class is returned.
-% @arg Equivalence An binary equivalence relation,
-%      i.e., a relation that is:
-%        1. Reflexive
-%        2. Symmetric
-%        3. Transitive
-%      Represented as a directed graph (see [ugraph]).
 % @arg EquivalenceClass The equivalence class of `Element`.
 %      This is an ordered set.
 
-equivalence_class(Element, EquivalenceRelation, EquivalenceClass):-
+equiv_class(EqRel, X, EqClass):-
   closure(
     % Since an equivalence relation is symmetric,
     % we do not need to use e.g. adjacent/3 here.
-    \Element^EquivalentElement^(
-      relation_pair(EquivalenceRelation, Element-EquivalentElement)
-    ),
-    [Element],
-    EquivalenceClass
+    \X^Y^relation_pair(EqRel, X-Y),
+    [X],
+    EqClass
+  ).
+
+:- begin_tests('equiv_class/3').
+
+test(
+  'equiv_class(+,+,-) is det. TRUE',
+  [forall(equiv_class_test(GName,X,EqClass))]
+):-
+  test_graph(GName, EqRel)
+  equiv_class(EqRel, X, EqClass).
+
+equiv_class_test(equiv(1), 1, [1,2,3,4]).
+equiv_class_test(equiv(1), 2, [1,2,3,4]).
+equiv_class_test(equiv(1), 3, [1,2,3,4]).
+equiv_class_test(equiv(1), 4, [1,2,3,4]).
+
+:- end_tests('equiv_class/3').
+
+
+
+%! is_equiv(+Relation:ugraph) is semidet.
+% Succeeds if the given relation is an equivalence relation.
+
+is_equiv(Rel):-
+  is_reflexive(Rel),
+  is_symmetric(Rel),
+  is_transitive(Rel).
+
+
+
+%! is_reflextive(+Relation:ugraph) is semidet.
+% Succeeds if the given binary relation is reflexive.
+
+is_reflexive(Rel):-
+  forall(
+    member(X-Ns, Rel),
+    memberchk(X, Ns)
   ).
 
 
+
+%! is_symmetric(+Relation:ugraph) is semidet.
+% Succeeds if the given relation is symmetric.
+
+is_symmetric(Rel):-
+  forall(
+    relation_pair(Rel, X-Y),
+    relation_pair(Rel, Y-X)
+  ).
+
+
+
+%! is_transitive(+Relation:ugraph) is semidet.
+% Suceeds if the given binary relation is transitive.
+
+is_transitive(Rel):-
+  forall(
+    (
+      relation_pair(Rel, X-Y),
+      relation_pair(Rel, Y-Z)
+    ),
+    relation_pair(Rel, X-Z)
+  ).
+
+
+
 %! quotient_set(
-%!   +Set:ordset,
 %!   +EquivalenceRelation:ugraph,
+%!   +Set:ordset,
 %!   -QuotientSet:ordset(ordset)
 %! ) is det.
 % Returns the quotient set for `Set`,
@@ -108,150 +152,111 @@ equivalence_class(Element, EquivalenceRelation, EquivalenceClass):-
 %
 % The standard notation for a quotient set is $S / \approx$.
 %
-% @arg Set An ordered set.
 % @arg EquivalenceRelation A (binary) equivalence relation.
 %      Represented as a directed graph (see [ugraph]).
+% @arg Set An ordered set.
 % @arg QuotientSet The quotient set of `Set`.
 %      An ordered set.
 %
 % @tbd Use the algorithm for calculating graph components for this?
 
-quotient_set(Set, EquivalenceRelation, QuotientSet):-
+quotient_set(EqRelation, Set, QSet):-
   aggregate_all(
-    set(EquivalenceClass),
+    set(EqClass),
     (
-      member(Element, Set),
-      equivalence_class(Element, EquivalenceRelation, EquivalenceClass)
+      member(X, Set),
+      equiv_class(X, EqRel, EqClass)
     ),
-    QuotientSet
+    QSet
   ).
 
-
-%! reflextive(+Relation:ugraph) is semidet.
-% Succeeds if the given binary relation is reflexive.
-
-reflexive(Relation):-
-  forall(
-    member(X-Ns, Relation),
-    memberchk(X, Ns)
-  ).
 
 
 %! reflexive_closure(+Relation:ugraph, -ReflexiveRelation:ugraph) is det.
 
-reflexive_closure(Relation, ReflexiveRelation):-
+reflexive_closure(Rel, ReflRel):-
   relational_closure(
-    Relation,
+    Rel,
     \Pairs^Result^(
       member(Pair, Pairs),
-      (
-        Result = Pair
-      ;
-        pair_element(Pair, Element),
-        Result = Element-Element
+      (   Result = Pair
+      ;   pair_element(Pair, X),
+          Result = X-X
       )
     ),
-    ReflexiveRelation
+    ReflRel
   ).
+
 
 
 %! relation(+Relation:ugraph, -Set:ordset, -Pairs:ordset(pair)) is det.
 %! relation(-Relation:ugraph, +Set:ordset, +Pairs:ordset(pair)) is det.
+% Succeeds if Relation relates the elements in Set according to Pairs.
 
-relation(Relation, Set, Pairs):-
-  s_graph_components(Relation, Set, Pairs).
+relation(Rel, Set, Pairs):-
+  s_graph_components(Rel, Set, Pairs).
 
-
-%! relation_element(+Relation:ugraph, +Element) is semidet.
-%! relation_element(+Relation:ugraph, -Element) is nondet.
-
-relation_element(Relation, Element):-
-  call_ground_as_semidet(member(Element-_, Relation)).
 
 
 %! relation_pair(+Relation:ugraph, +Pair:pair) is semidet.
 %! relation_pair(+Relation:ugraph, -Pair:pair) is nondet.
 % The extension of a binary relation.
 
-relation_pair(Relation, Pair):-
-  s_edge(Relation, Pair).
+relation_pair(Rel, Pair):-
+  s_edge(Rel, Pair).
 
-
-%! symmetric(+Relation:ugraph) is semidet.
-% Succeeds if the given relation is symmetric.
-
-symmetric(Relation):-
-  forall(
-    relation_pair(Relation, X-Y),
-    relation_pair(Relation, Y-X)
-  ).
 
 
 %! symmetric_closure(+Relation:ugraph, -SymmetryRelation:ugraph) is det.
 
-symmetric_closure(Relation, SymmetryRelation):-
+symmetric_closure(Rel, SymmRel):-
   relational_closure(
-    Relation,
+    Rel,
     \Pairs^Result^(
       member(Pair, Pairs),
-      (
-        Result = Pair
-      ;
-        inverse_pair(Pair, Result)
+      (   Result = Pair
+      ;   inverse_pair(Pair, Result)
       )
     ),
-    SymmetryRelation
+    SymmRel
   ).
 
 
-%! transitive(+Relation:ugraph) is semidet.
-% Suceeds if the given binary relation is transitive.
 
-transitive(Relation):-
-  forall(
-    (
-      relation_pair(Relation, X-Y),
-      relation_pair(Relation, Y-Z)
-    ),
-    relation_pair(Relation, X-Z)
-  ).
-
-
-/* Transitive closure over a srep graph / ugraph could have been implemented
-   using relational_closure/3:
 %! transitive_closure(+Relation:ugraph, -TransitiveRelation:ugraph) is det.
+% Transitive closure over a srep graph / ugraph could have been implemented
+% using relational_closure/3:
 
-transitive_closure(Relation, TransitiveRelation):-
+transitive_closure(Rel, TransRel):-
   relational_closure(
-    Relation,
+    Rel,
     \Pairs^Result^(
-      member(Result, Pairs)
-    ;
-      member(X-Y, Pairs),
-      member(Y-Z, Pairs),
-      Result = X-Z
+        member(Result, Pairs)
+    ;   member(X-Y, Pairs),
+        member(Y-Z, Pairs),
+        Result = X-Z
     ),
-    TransitiveRelation
+    TransRel
   ).
-*/
 
 
 
-% Helpers.
+
+
+% HELPERS %
 
 %! relational_closure(
 %!   +Relation:ugraph,
 %!   :Goal,
 %!   -ClosedRelation:ugraph
-%! ) .
+%! ) is det.
 % Allows the calculation of the closure of a relation directly.
 % Internally, the closure is calculated for the extension of the relation,
 % i.e., its edge pairs.
 %
 % The mode is the same as for `Goal`.
 
-relational_closure(Relation, Goal, ClosedRelation):-
-  relation(Relation, Set, Pairs),
-  closure(Goal, Pairs, ClosedPairs),
-  relation(ClosedRelation, Set, ClosedPairs).
-
+relational_closure(Rel, Goal_2, ClosedRel):-
+  relation(Rel, Set, Pairs),
+  closure(Goal_2, Pairs, ClosedPairs),
+  relation(ClosedRel, Set, ClosedPairs).

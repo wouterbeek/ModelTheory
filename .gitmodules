@@ -1,9 +1,0 @@
-[submodule "plSet"]
-	path = plSet
-	url = https://github.com/wouterbeek/plSet.git
-[submodule "Prolog-Library-Collection"]
-	path = Prolog-Library-Collection
-	url = https://github.com/wouterbeek/Prolog-Library-Collection.git
-[submodule "plGraph"]
-	path = plGraph
-	url = https://github.com/wouterbeek/plGraph.git

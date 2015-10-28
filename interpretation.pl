@@ -15,24 +15,29 @@ Implements the interpretation of formulas from a formal language
 into the universe of discourse.
 
 @author Wouter Beek
-@version 2014/07
+@license MIT license
+% @tbd Add support for functions.
+@version 2015/10
 */
 
 :- use_module(library(apply)).
+:- use_module(library(db_ext)).
+:- use_module(library(mt/formal_lang)).
 :- use_module(library(plunit)).
 
-:- use_module(plc(generics/db_ext)).
-
-:- use_module(plSet(universe_of_discourse)).
-
-:- use_module(mt(formal_language)).
+%! interpretation(+Name:atom, +Object) is semidet.
+%! interpretation(+Name:atom, -Object) is semidet.
+%! interpretation(-Name:atom, +Object) is nondet.
+%! interpretation(-Name:atom, -Object) is multi.
 
 :- dynamic(interpretation/2).
 
 
 
-¬(Goal):-
-  \+ evaluate_formula(Goal).
+
+
+¬(Goal_0):-
+  \+ evaluate_formula(Goal_0).
 
 
 ∧(Goal1, Goal2):-
@@ -64,6 +69,7 @@ into the universe of discourse.
   evaluate_formula(→(Goal2, Goal1)).
 
 
+
 %! add_interpretation(+Term:compound, +Interpretation) is det.
 % Succeeds if the given term already has the given interpretation.
 %
@@ -92,30 +98,33 @@ add_interpretation(Predicate, Relation):-
 add_interpretation(Term, _):-
   existence_error(term, Term).
 
+
 % Error: object does not exist.
-add_interpretation_individual_constant0(_, Object):-
-  \+ object(Object), !,
-  existence_error(object, Object).
+add_interpretation_individual_constant0(_, Obj):-
+  \+ object(Obj), !,
+  existence_error(object, Obj).
 % Add the individual constant interpretation.
-add_interpretation_individual_constant0(IndividualConstant, Object):-
-  db_add_novel(interpretation(IndividualConstant/0, Object)).
+add_interpretation_individual_constant0(IndividualConstant, Obj):-
+  db_add_if_new(interpretation(IndividualConstant/0, Obj)).
+
 
 % Error: relation does not exist.
-add_interpretation_predicate0(_, Relation):-
-  \+ relation(Relation), !,
-  existence_error(relation, Relation).
+add_interpretation_predicate0(_, Rel):-
+  \+ relation(Rel), !,
+  existence_error(relation, Rel).
 % Add the predicate interpretation.
-add_interpretation_predicate0(Predicate, Relation):-
-  db_add_novel(interpretation(Predicate, Relation)).
+add_interpretation_predicate0(Pred, Rel):-
+  db_add_if_new(interpretation(Pred, Rel)).
+
 
 
 %! evaluate_formula(+Formula:compound) is semidet.
 
 evaluate_formula(AtomicFormula):-
   atomic_formula(AtomicFormula), !,
-  compound_name_arguments(AtomicFormula, Predicate, Arguments),
-  maplist(interpretation, [Predicate|Arguments], [Relation|Objects]),
-  once(relation(Relation, Objects)).
+  compound_name_arguments(AtomicFormula, Pred, Args),
+  maplist(interpretation, [Pred|Args], [Rel|Objs]),
+  once(relation(Rel, Objs)).
 evaluate_formula(Formula):-
   Formula.
 
@@ -135,18 +144,12 @@ evaluate_formula_test(⊕(dachshund(wouter),dachshund(teddy)), true).
 :- end_tests(evaluate_formula).
 
 
-%! interpretation(+Name:atom, +Object) is semidet.
-%! interpretation(+Name:atom, -Object) is semidet.
-%! interpretation(-Name:atom, +Object) is nondet.
-%! interpretation(-Name:atom, -Object) is multi.
-% @tbd Add support for functions.
 
 
 
-% Debug.
+% TESTS %
 
 load_i1:-
   formal_language:load_fl1([C1,C2,C3], [P1,P2]),
   universe_of_discourse:load_uod1([O1,O2,O3], [R1,R2]),
   maplist(add_interpretation, [C1,C2,C3,P1,P2], [O1,O2,O3,R1,R2]).
-
